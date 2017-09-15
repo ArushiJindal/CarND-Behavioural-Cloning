@@ -42,7 +42,8 @@ def crop_image(image, top_percent=0.36, bottom_percent=0.15):
     top = int(np.ceil(image.shape[0] * top_percent))
     bottom = image.shape[0] - int(np.ceil(image.shape[0] * bottom_percent))
     return image[top:bottom, :]
-
+ 
+# Reffered from https://github.com/toluwajosh/CarND-Behavioural-Cloning
 def augment_brightness(image):
     	"""
     	apply random brightness on the image
@@ -54,7 +55,7 @@ def augment_brightness(image):
     	image[:,:,2] = image[:,:,2]*random_bright
     	return image
     
-    
+# Reffered from https://github.com/toluwajosh/CarND-Behavioural-Cloning    
 def trans_image(image,steer,trans_range, trans_y=False):
     
     
@@ -79,7 +80,7 @@ def trans_image(image,steer,trans_range, trans_y=False):
     	
     return image_tr,steer_ang
     
-    
+# Reffered from https://github.com/toluwajosh/CarND-Behavioural-Cloning   
 def im_process(image, steer_ang, train=True):
     """"
     Apply Processing to the image
@@ -96,7 +97,7 @@ def im_process(image, steer_ang, train=True):
     image = crop_image(image,0.35,0.12)
     
     # flip image (randomly)
-    if np.random.uniform()>= 0.5: #and abs(steer_ang) > 0.1
+    if np.random.uniform()>= 0.5: 
         image = cv2.flip(image, 1)
         steer_ang = -steer_ang
     
