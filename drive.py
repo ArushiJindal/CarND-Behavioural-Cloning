@@ -3,7 +3,7 @@ import base64
 from datetime import datetime
 import os
 import shutil
-
+import scipy.misc
 import numpy as np
 import socketio
 import eventlet
@@ -11,6 +11,7 @@ import eventlet.wsgi
 from PIL import Image
 from flask import Flask
 from io import BytesIO
+import cv2
 
 from keras.models import load_model
 import h5py
@@ -44,9 +45,14 @@ class SimplePIController:
 
 
 controller = SimplePIController(0.1, 0.002)
-set_speed = 9
+set_speed = 18
 controller.set_desired(set_speed)
 
+def crop_camera(image, top_percent=0.36, bottom_percent=0.15):
+    
+    top = int(np.ceil(image.shape[0] * top_percent))
+    bottom = image.shape[0] - int(np.ceil(image.shape[0] * bottom_percent))
+    return image[top:bottom, :]
 
 @sio.on('telemetry')
 def telemetry(sid, data):
@@ -60,7 +66,11 @@ def telemetry(sid, data):
         # The current image from the center camera of the car
         imgString = data["image"]
         image = Image.open(BytesIO(base64.b64decode(imgString)))
+        
         image_array = np.asarray(image)
+        image_array = crop_camera(image_array,0.30,0.10)
+        image_array = scipy.misc.imresize(image_array, (66,200))
+        image_array = cv2.cvtColor(image_array,cv2.COLOR_RGB2HSV)
         steering_angle = float(model.predict(image_array[None, :, :, :], batch_size=1))
 
         throttle = controller.update(float(speed))
